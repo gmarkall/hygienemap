@@ -152,7 +152,8 @@ body { margin: 0; padding: 0; }
         );
 
         document.getElementById('searchnearby').addEventListener('click', () => {
-            console.log('Button clicked');
+          const {lng, lat} = map.getCenter();
+          console.log('Button clicked at', lng, ',', lat);
         });
 
     });
