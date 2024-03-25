@@ -34,8 +34,8 @@ body { margin: 0; padding: 0; }
       for (let i = 0; i < items.length; i++) {
         const name = items[i].getElementsByTagName('BusinessName')[0].textContent;
         const geocodes = items[i].getElementsByTagName('Geocode');
-        console.log(name);
-        console.log(geocodes);
+        // console.log(name);
+        // console.log(geocodes);
         if (geocodes.length != 1) {
           continue;
         }
@@ -66,16 +66,14 @@ body { margin: 0; padding: 0; }
     }
 
     function getEstablishmentData(dataURL) {
-        fetch(dataURL)
+        return fetch(dataURL)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not OK');
                 }
               return response.text();
             })
-        .then(data => {
-            return parseXML(data)
-        })
+        .then(data => parseXML(data))
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
         });
@@ -89,33 +87,40 @@ body { margin: 0; padding: 0; }
                 if (error) throw error;
                 map.addImage('custom-marker', image);
                 // Add a GeoJSON source with 2 points
-                features = getEstablishmentData('FHRS221en-GB.xml');
-                map.addSource('points', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'FeatureCollection',
-                        'features': features
-                    }
-                });
-
-                // Add a symbol layer
-                map.addLayer({
-                    'id': 'points',
-                    'type': 'symbol',
-                    'source': 'points',
-                    'layout': {
-                        'icon-image': 'custom-marker',
-                        // get the title name from the source's "title" property
-                        'text-field': ['get', 'title'],
-                        'text-font': [
-                            'Open Sans Semibold',
-                            'Arial Unicode MS Bold'
-                        ],
-                        'text-offset': [0, 1.25],
-                        'text-anchor': 'top'
-                    }
-                });
-            }
+                getEstablishmentData('FHRS221en-GB.xml')
+                  .then(features => {
+                    map.addSource('points', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'FeatureCollection',
+                            'features': features
+                        }
+                      }
+                    );
+                    console.log("added points");
+                  }
+                )
+                  .then(layer => {
+                    console.log("adding layer");
+                    // Add a symbol layer
+                    map.addLayer({
+                        'id': 'points',
+                        'type': 'symbol',
+                        'source': 'points',
+                        'layout': {
+                            'icon-image': 'custom-marker',
+                            // get the title name from the source's "title" property
+                            'text-field': ['get', 'title'],
+                            'text-font': [
+                                'Open Sans Semibold',
+                                'Arial Unicode MS Bold'
+                            ],
+                            'text-offset': [0, 1.25],
+                            'text-anchor': 'top'
+                        }
+                    });
+                  })
+                }
         );
 
     });
