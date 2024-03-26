@@ -5,12 +5,12 @@ function parseXML(xmlString) {
 }
 
 function extractData(xmlDoc) {
-    const items = xmlDoc.getElementsByTagName('EstablishmentDetail');
+    const items = xmlDoc.getElementsByTagName('establishment');
     const resultArray = [];
 
     for (let i = 0; i < items.length; i++) {
         const name = items[i].getElementsByTagName('BusinessName')[0].textContent;
-        const geocodes = items[i].getElementsByTagName('Geocode');
+        const geocodes = items[i].getElementsByTagName('geocode');
         // console.log(name);
         // console.log(geocodes);
         if (geocodes.length != 1) {
@@ -19,8 +19,8 @@ function extractData(xmlDoc) {
 
         const geocode = geocodes[0]
 
-        const longitudetag = geocode.getElementsByTagName('Longitude')
-        const latitudetag = geocode.getElementsByTagName('Latitude')
+        const longitudetag = geocode.getElementsByTagName('longitude')
+        const latitudetag = geocode.getElementsByTagName('latitude')
         if ((longitudetag.length != 1) || (latitudetag.length != 1)) {
             continue;
         }
@@ -43,7 +43,14 @@ function extractData(xmlDoc) {
 }
 
 function getEstablishmentData(dataURL) {
-    return fetch(dataURL)
+    const headers = {
+        'x-api-version': '2',
+        'Accept': 'application/xml'
+    };
+
+    return fetch(dataURL, {
+            headers: headers
+        })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not OK');
@@ -57,7 +64,9 @@ function getEstablishmentData(dataURL) {
 }
 
 function getNearbyData(lng, lat) {
-    getEstablishmentData('FHRS221en-GB.xml')
+    const dataURL = `https://api.ratings.food.gov.uk/Establishments?longitude=${lng}&latitude=${lat}`
+    console.log('Fetching from', dataURL);
+    getEstablishmentData(dataURL)
         .then(features => {
             map.addSource('points', {
                 'type': 'geojson',
