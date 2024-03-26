@@ -1,4 +1,3 @@
-mapboxgl.accessToken = 'pk.eyJ1IjoiaHlnaWVuZW1hcCIsImEiOiJjbHUzYXlhY2ExMmM5Mm1wZHlnaGxta2V4In0.LBPjd98ICZNL82X3E2jJtQ';
 const map = new mapboxgl.Map({
     container: 'map', // container ID
     center: [-0.70140, 53.15791], // starting position [lng, lat]
@@ -113,5 +112,3 @@ map.on('load', () => {
     });
 
 });
-
-
