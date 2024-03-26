@@ -66,9 +66,12 @@ function getEstablishmentData(dataURL) {
 function getNearbyData(lng, lat) {
     const dataURL = `https://api.ratings.food.gov.uk/Establishments?longitude=${lng}&latitude=${lat}`
     console.log('Fetching from', dataURL);
+    const sourcename = `points${pointsources}`;
+    pointsources += 1;
+    console.log('Adding source', sourcename);
     getEstablishmentData(dataURL)
         .then(features => {
-            map.addSource('points', {
+            map.addSource(sourcename, {
                 'type': 'geojson',
                 'data': {
                     'type': 'FeatureCollection',
@@ -81,9 +84,9 @@ function getNearbyData(lng, lat) {
             console.log("adding layer");
             // Add a symbol layer
             map.addLayer({
-                'id': 'points',
+                'id': sourcename,
                 'type': 'symbol',
-                'source': 'points',
+                'source': sourcename,
                 'layout': {
                     'icon-image': 'custom-marker',
                     // get the title name from the source's "title" property
@@ -125,3 +128,5 @@ map.on('load', () => {
     });
 
 });
+
+pointsources = 0;
