@@ -56,6 +56,40 @@ function getEstablishmentData(dataURL) {
         });
 }
 
+function getNearbyData(lng, lat) {
+    getEstablishmentData('FHRS221en-GB.xml')
+        .then(features => {
+            map.addSource('points', {
+                'type': 'geojson',
+                'data': {
+                    'type': 'FeatureCollection',
+                    'features': features
+                }
+            });
+            console.log("added points");
+        })
+        .then(layer => {
+            console.log("adding layer");
+            // Add a symbol layer
+            map.addLayer({
+                'id': 'points',
+                'type': 'symbol',
+                'source': 'points',
+                'layout': {
+                    'icon-image': 'custom-marker',
+                    // get the title name from the source's "title" property
+                    'text-field': ['get', 'title'],
+                    'text-font': [
+                        'Open Sans Semibold',
+                        'Arial Unicode MS Bold'
+                    ],
+                    'text-offset': [0, 1.25],
+                    'text-anchor': 'top'
+                }
+            });
+        });
+}
+
 const map = new mapboxgl.Map({
     container: 'map', // container ID
     center: [-0.70140, 53.15791], // starting position [lng, lat]
@@ -69,38 +103,6 @@ map.on('load', () => {
         (error, image) => {
             if (error) throw error;
             map.addImage('custom-marker', image);
-            // Add a GeoJSON source with 2 points
-            getEstablishmentData('FHRS221en-GB.xml')
-                .then(features => {
-                    map.addSource('points', {
-                        'type': 'geojson',
-                        'data': {
-                            'type': 'FeatureCollection',
-                            'features': features
-                        }
-                    });
-                    console.log("added points");
-                })
-                .then(layer => {
-                    console.log("adding layer");
-                    // Add a symbol layer
-                    map.addLayer({
-                        'id': 'points',
-                        'type': 'symbol',
-                        'source': 'points',
-                        'layout': {
-                            'icon-image': 'custom-marker',
-                            // get the title name from the source's "title" property
-                            'text-field': ['get', 'title'],
-                            'text-font': [
-                                'Open Sans Semibold',
-                                'Arial Unicode MS Bold'
-                            ],
-                            'text-offset': [0, 1.25],
-                            'text-anchor': 'top'
-                        }
-                    });
-                })
         }
     );
 
@@ -110,6 +112,7 @@ map.on('load', () => {
             lat
         } = map.getCenter();
         console.log('Button clicked at', lng, ',', lat);
+        getNearbyData(lng, lat);
     });
 
 });
