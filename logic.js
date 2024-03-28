@@ -59,7 +59,7 @@ function extractData(xmlDoc) {
                 'coordinates': [longitude, latitude]
             },
             'properties': {
-                'title': name,
+                'title': `(${rating}) ${name}`,
                 'rating': rating,
                 'ratingdate': ratingdate
             }
@@ -116,7 +116,17 @@ function getNearbyData(lng, lat) {
                 'type': 'symbol',
                 'source': sourcename,
                 'layout': {
-                    'icon-image': 'custom-marker',
+                    'icon-image': 'restaurant',
+                    'icon-allow-overlap': true,
+                    //'icon-color':  [ 'interpolate',
+                    //    ['linear'],
+                    //    ['get', 'rating'],
+                    //    0,
+                    //    '#FF0000',
+                    //    5,
+                    //    '#00FF00'
+                    //],
+
                     // get the title name from the source's "title" property
                     'text-field': ['get', 'title'],
                     'text-font': [
@@ -165,18 +175,19 @@ function getNearbyData(lng, lat) {
 const map = new mapboxgl.Map({
     container: 'map', // container ID
     center: [-0.70140, 53.15791], // starting position [lng, lat]
+    style: 'mapbox://styles/mapbox/streets-v12',
     zoom: 15 // starting zoom
 });
 
 map.on('load', () => {
     // Add an image to use as a custom marker
-    map.loadImage(
-        'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
-        (error, image) => {
-            if (error) throw error;
-            map.addImage('custom-marker', image);
-        }
-    );
+    //map.loadImage(
+    //    'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+    //    (error, image) => {
+    //        if (error) throw error;
+    //        map.addImage('custom-marker', image);
+    //    }
+    //);
 
     document.getElementById('searchnearby').addEventListener('click', () => {
         const {
