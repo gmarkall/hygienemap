@@ -4,6 +4,17 @@ function parseXML(xmlString) {
     return extractData(xmlDoc);
 }
 
+function dmyDate(isoDate) {
+    const date = new Date(isoDate);
+
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // Add 1 because months are 0-based
+    const day = date.getDate();
+
+    const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+    return formattedDate;
+}
+
 function extractData(xmlDoc) {
     const items = xmlDoc.getElementsByTagName('establishment');
     const resultArray = [];
@@ -26,6 +37,21 @@ function extractData(xmlDoc) {
         }
         const longitude = parseFloat(longitudetag[0].textContent);
         const latitude = parseFloat(latitudetag[0].textContent);
+
+        const ratings = items[i].getElementsByTagName('RatingValue');
+        if (ratings.length != 1) {
+            rating = 'Unknown';
+        } else {
+            rating = ratings[0].textContent;
+        }
+
+        const ratingdates = items[i].getElementsByTagName('RatingDate');
+        if (ratingdates.length != 1) {
+            ratingdate = "Unknown";
+        } else {
+            ratingdate = dmyDate(ratingdates[0].textContent);
+        }
+
         const entry = {
             'type': 'Feature',
             'geometry': {
@@ -33,7 +59,9 @@ function extractData(xmlDoc) {
                 'coordinates': [longitude, latitude]
             },
             'properties': {
-                'title': name
+                'title': name,
+                'rating': rating,
+                'ratingdate': ratingdate
             }
         };
         resultArray.push(entry);
@@ -105,7 +133,9 @@ function getNearbyData(lng, lat) {
             map.on('click', sourcename, (e) => {
                 // Copy coordinates array.
                 const coordinates = e.features[0].geometry.coordinates.slice();
-                const description = e.features[0].properties.title;
+                const rating = e.features[0].properties.rating;
+                const ratingdate = e.features[0].properties.ratingdate;
+                const description = `Rating: ${rating}<br>Rating date: ${ratingdate}`;
 
                 // Ensure that if the map is zoomed out such that multiple
                 // copies of the feature are visible, the popup appears
